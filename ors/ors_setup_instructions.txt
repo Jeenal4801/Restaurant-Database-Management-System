@@ -1,0 +1,108 @@
+================================================
+* Install Python , Pycharm , MySQL  Software
+* Add Path to Windows Environment
+* Check path in Windows command prompt with type "path"  , whether required path is add or not ?
+================================================
+* 	For  Python - Mysql Connectivity
+	D:\Python\Python37-32\Scripts> pip install  mysql-connector-python
+
+* 	For  Python tabulate package
+	D:\Python\Python37-32\Scripts> pip install  tabulate
+
+* 	For  Python pymysql package
+	D:\Python\Python37-32\Scripts> pip install  pymysql
+	
+	* 	For  Python pyautogui package
+	D:\Python\Python37-32\Scripts> pip install  pyautogui
+	
+	pip install numpy
+	pip install scipy
+	pendulum
+	moviepy
+	#pip install requests
+	pip install tkinter
+	pyqt
+	pip install pandas
+	pywin32
+	pytest
+	sqlaichemy
+	wxpython
+	delorean
+	beautifulsoup
+	bokeh
+	pytil
+	scikit
+	networkX
+	pygame
+	textblob
+	#pip install insights
+	
+	You are using pip version 19.0.3, however version 21.0.1 is available.
+	You should consider upgrading via the 'python -m pip install --upgrade pip' command.
+	
+	python -m pip install --upgrade pip
+
+================================================	
+*  Create "ors" user in mysql without passowrd
+*  create "ors" schema in mysql 
+* Import / Run dump sql script in "ors" user.
+* In dump sql triiger is comment out , please remove comment and sql the triiger in "ors" user.
+================================================
+* For Pythow program Call , change the path of Pythonw to "ors.py" program.
+
+	'D:\Python\Python37-32\pythonw.exe "D:\Python\Python37-32\Lib\idlelib\idle.pyw"'
+
+	Note : open "ors.py" file in editor & Gloabally replace it.
+
+* Run the ors.py program through command prompt 
+
+  e.g. d:\test\ors> python ors.py
+  
+* Check all program one by one throgh main program "ors.py"  
+
+================================================
+
+* Call Procedure / Function inside MySQL database 
+
+ e.g.
+ 
+	call proc_billsummary(curdate(),1);
+	
+	call proc_dispcashier('m%');
+	call proc_dispcashier('%');
+	
+	call proc_dispcheff('s%');
+	call proc_dispcheff('%');
+	
+	call proc_dispcust('s%');
+	call proc_dispcust('%');
+	
+	call proc_dispmanager('s%');
+	call proc_dispmanager('%');
+	
+	call proc_dispwaiter('m%') ; 
+	call proc_dispwaiter('%') ; 
+	
+	call proc_dispitem('roti%');
+	call proc_dispitem('%');
+	
+	call proc_disporder_itemwise('1');
+	
+	call proc_disporder_mgrwise('1');
+	
+	call proc_disporder_custwise('1');
+	call proc_disporder_custwise_total('1');
+	call proc_disporder_custwise_total('%');
+	
+	call proc_billsummary(curdate(),1);
+	select * from bill;
+	
+	---------------------
+	call  customern ;
+	call itemprice ;
+	call orderitem ;
+	call ordermanagername ;
+	call waiterorder ; 
+	
+	
+================================================

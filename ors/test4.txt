@@ -1,0 +1,68 @@
+https://stackoverflow.com/questions/10865483/print-results-in-mysql-format-with-python/54423394
+
+sql = "SELECT * FROM someTable"
+cursor.execute(sql)
+conn.commit()
+results = cursor.fetchall()
+
+widths = []
+columns = []
+tavnit = '|'
+separator = '+' 
+
+for cd in cursor.description:
+    widths.append(max(cd[2], len(cd[0])))
+    columns.append(cd[0])
+
+for w in widths:
+    tavnit += " %-"+"%ss |" % (w,)
+    separator += '-'*w + '--+'
+
+print(separator)
+print(tavnit % tuple(columns))
+print(separator)
+for row in results:
+    print(tavnit % row)
+print(separator)
+This is the output:
+
++--------+---------+---------------+------------+------------+
+| ip_log | user_id | type_id       | ip_address | time_stamp |
++--------+---------+---------------+------------+------------+
+| 227    | 1       | session_login | 10.0.0.2   | 1358760386 |
+| 140    | 1       | session_login | 10.0.0.2   | 1358321825 |
+| 98     | 1       | session_login | 10.0.0.2   | 1358157588 |
++--------+---------+---------------+------------+------------+
+
+==================================================================================
+
+import mysql.connector
+from tabulate import tabulate
+
+mydb = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                passwd="password",
+                database="testDB"
+              )
+
+mycursor = mydb.cursor()
+mycursor.execute("SELECT emp_name, salary FROM emp_table")
+myresult = mycursor.fetchall()
+
+
+print(tabulate(myresult, headers=['EmpName', 'EmpSalary'], tablefmt='psql'))
+Output:
+
+user@system:~$ python python_mysql.py
++------------+-------------+
+| EmpName    | EmpSalary   |
+|------------+-------------|
+| Ram        | 400         |
+| Dipankar   | 100         |
+| Santhosh   | 200         |
+| Nirmal     | 470         |
+| Santu      | 340         |
+| Shiva      | 100         |
+| Karthik    | 500         |
++------------+-------------+

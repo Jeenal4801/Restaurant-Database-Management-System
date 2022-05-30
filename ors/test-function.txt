@@ -1,0 +1,15 @@
+CREATE FUNCTION `func_dispitem` 
+( itemname varchar(45) 
+  test1 int
+)
+RETURNS integer
+BEGIN
+select * from item where name like itemname ;
+RETURN 1;
+END
+
+
+
+ALTER TABLE `ors`.`order` 
+RENAME TO  `ors`.`order_old` ;
+

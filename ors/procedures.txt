@@ -1,0 +1,220 @@
+CREATE PROCEDURE `proc_disporder_mgrwise`(
+in mgrno int
+)
+BEGIN
+
+SELECT m.name,c.name,  i.name, o.price , o.quantity
+FROM ors.order o , manager m , item i , customer c
+where o.managerid = m.idno
+and  o.itemId = i.itemNo
+and o.customerId = c.customer_id
+and o.managerId = mgrno
+order by o.managerId, o.customerId, o.itemId ;
+
+END
+
+------------------
+CREATE PROCEDURE `proc_disporder_itemwise`(
+in itemnumber int
+)
+BEGIN
+
+SELECT i.name, c.name,  o.quantity ,  o.price
+FROM ors.order o ,  item i , customer c
+where o.itemId = i.itemNo
+and o.customerId = c.customer_id
+and o.itemId = itemnumber
+order by o.itemId, o.customerId  ;
+
+END
+
+-------------------------
+CREATE PROCEDURE `proc_disporder_custwise`(
+in custnumber int
+)
+BEGIN
+
+SELECT  c.name,  i.name, o.quantity , o.price
+FROM ors.order o ,  item i , customer c
+where o.itemId = i.itemNo
+and o.customerId = c.customer_id
+and o.customerId = custnumber
+order by o.customerId , o.itemId  ;
+
+END
+
+---------------------------------
+CREATE DEFINER=`ors`@`%` PROCEDURE `proc_disporder_custwise_total`(
+in custnumber int
+)
+BEGIN
+
+SELECT  c.name, count(o.quantity) , sum(o.price)
+FROM ors.order o ,  item i , customer c
+where o.itemId = i.itemNo
+and o.customerId = c.customer_id
+and o.customerId like custnumber
+group by c.name
+order by c.name   ;
+
+END
+
+------------------------------------
+CREATE TRIGGER `order_AFTER_INSERT` 
+AFTER INSERT ON `order` 
+FOR EACH ROW 
+BEGIN
+update ors.order 
+set price = i.price * NEW.quantity 
+where i.itemno = NEW.itemid 
+and i.itemno in ( select i.itemno from item i 
+where i.itemno = NEW.itemid ) ;
+
+END
+
+------------------------------------
+DROP TRIGGER IF EXISTS `ors`.`order_AFTER_INSERT` ;
+
+
+----------------------------------------
+CREATE DEFINER=`ors`@`%` TRIGGER `test1_BEFORE_INSERT` 
+BEFORE INSERT ON `test1` 
+FOR EACH ROW BEGIN
+set NEW.c3=curdate();
+END
+
+----------------------------------------
+
+SELECT 	o.customerId ,c.name,
+		o.itemId , i.name, 
+        o.managerId , m.name,
+        o.waiterId, w.name,
+		o.quantity ,  o.price
+FROM ors.order o ,  item i , customer c , manager m , waiter w 
+where o.itemId = i.itemNo
+and o.customerId = c.customer_id
+and o.managerId = m.idno
+and o.waiterId = w.idno
+order by o.customerId , o.itemId , o.managerId , o.waiterId ;
+
+------------------------------------
+
+
+               cursor.execute("SELECT 	o.customerId , o.itemId ,   \
+                                o.managerId  , \
+                                o.waiterId  ,  \
+                                o.quantity ,  o.price \
+                                FROM ors.order o ,  item i , customer c , manager m , waiter w  \
+                                where o.itemId = i.itemNo \
+                                and o.customerId = c.customer_id \
+                                and o.managerId = m.idno \
+                                and o.waiterId = w.idno \
+                                order by o.customerId , o.itemId , o.managerId , o.waiterId ;")
+  
+------------------------------------
+call proc_disporder_custwise_total('1');
+call proc_disporder_custwise_total('%');
+
+	CREATE TABLE `ors`.`test1` (
+  `c1` INT NOT NULL AUTO_INCREMENT,
+  `c2` INT NULL,
+  `c3` DATE NULL,
+  PRIMARY KEY (`c1`));
+  
+  
+  -----------------------
+  
+ CREATE TABLE `ors`.`bill` (
+  `billno` INT NOT NULL AUTO_INCREMENT,
+  `billdate` DATE NULL,
+  `customer_id` INT NULL,
+  `totqty` INT NULL,
+  `totprice` FLOAT NULL,
+  `tax` FLOAT NULL,
+  `totvalue` FLOAT NULL,
+  PRIMARY KEY (`billno`));
+
+------------------------------------
+
+CREATE PROCEDURE `proc_billsummary`(
+in billdate date,
+in custno int , 
+)
+Declare
+v_totqty int;
+v_totprice float;
+v_tax float;
+v_totvalue float;
+Begin
+
+set @v_totqty,@v_totprice , @v_tax , @v_totvalue 
+:= 
+(
+select count(o.quantity), sum(o.price),
+sum(o.price) * 0.18 , (sum(price)+ sum(o.price) * 0.18 )
+from ors.order o 
+where o.orderdate = "2021-04'21"
+and o.customerid = 1
+group by o.orderdate, o.customerid; 
+)
+
+insert into bill (billdat,customerId,totqty,totprice,tax,totvalue) 
+values billdate,custno,@v_totqty,@v_totprice,@v_tax,@v_totvalue );
+
+commit;
+
+END ;
+END
+
+
+--------
+
+select count(o.quantity), sum(o.price),
+sum(o.price) * 0.18 , (sum(price)+ sum(o.price) * 0.18 )
+from ors.order o 
+where o.orderdate = "2021-04'21"
+and o.customerid = 1
+group by o.orderdate, o.customerid; 
+
+
+delete from bill 
+where billdate = NEW.billdate 
+and customerid = NEW.customerid;
+
+delete from bill 
+where billdate = OLD.billdate 
+and customerid = OLD.customerid;
+------------------------------------
+
+select count(o.quantity), sum(o.price),
+sum(o.price) * 0.18 , (sum(price)+ (sum(o.price) * 0.18 )) , 1
+into v_totqty, v_totprice , v_tax , v_totvalue , v_x
+from ors.order o 
+where o.orderdate = billdate
+and o.customerid = custno
+group by o.orderdate, o.customerid; 
+
+
+
+
+set v_y :=
+(select 1  
+from bill b	
+where b.billdate = billdate
+and b.customerid = custno
+group by b.billdate, b.customerid )
+;
+
+--------------------------------
+
+* Bill qurty
+select b.billdate, b.customerid , c.name , b.totqty, b.totprice, b.tax, b.totvalue
+from bill b	, customer c 
+where b.billdate = '2021-04-21'
+#and b.customerid = 1
+and b.customerid = c.customer_id
+order by b.billdate, b.customerid ;
+
+
+----------------------------
+
